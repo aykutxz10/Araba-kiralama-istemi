@@ -1,0 +1,63 @@
+class Vehicle {
+    static idCounter = 1;
+    
+    constructor(type, price) {
+        this.id = Vehicle.idCounter++;
+        this.type = type;
+        this.price = price;
+    }
+}
+
+class VehicleManager {
+    constructor() {
+        this.vehicles = [];
+    }
+
+    addVehicle(type, price) {
+        this.vehicles.push(new Vehicle(type, price));
+        console.log("Araç eklendi.");
+    }
+
+    removeVehicle(id) {
+        this.vehicles = this.vehicles.filter(v => v.id !== id);
+        console.log("Araç silindi.");
+    }
+
+    listVehicles() {
+        console.log("Araç Listesi:");
+        this.vehicles.forEach(vehicle => {
+            console.log(`ID: ${vehicle.id}, Tip: ${vehicle.type}, Fiyat: ${vehicle.price}`);
+        });
+    }
+
+    sellVehicle(id, discountPercentage) {
+        const vehicle = this.vehicles.find(v => v.id === id);
+        if (vehicle) {
+            const discountAmount = vehicle.price * (discountPercentage / 100);
+            const finalPrice = vehicle.price - discountAmount;
+            console.log(`Araç Satıldı! İndirim: ${discountAmount}, Satış Tutarı: ${finalPrice}`);
+            this.removeVehicle(id);
+        } else {
+            console.log("Araç bulunamadı.");
+        }
+    }
+
+    rentVehicle(id, rentalDays, discountPercentage) {
+        const vehicle = this.vehicles.find(v => v.id === id);
+        if (vehicle) {
+            const rentalPrice = vehicle.price * rentalDays;
+            const discountAmount = rentalPrice * (discountPercentage / 100);
+            const finalRentalPrice = rentalPrice - discountAmount;
+            console.log(`Araç Kiralandı! İndirim: ${discountAmount}, Toplam Kiralama Tutarı: ${finalRentalPrice}`);
+        } else {
+            console.log("Araç bulunamadı.");
+        }
+    }
+}
+
+const manager = new VehicleManager();
+manager.addVehicle("Araba", 30000);
+manager.addVehicle("Kamyonet", 50000);
+manager.listVehicles();
+manager.sellVehicle(1, 10);
+manager.rentVehicle(2, 5, 15);
