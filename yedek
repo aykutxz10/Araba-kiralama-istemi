@@ -1,0 +1,192 @@
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        VehicleManager vehicleManager = new VehicleManager();
+        vehicleManager.Run();
+    }
+}
+
+public class VehicleManager
+{
+    private List<Vehicle> vehicles = new List<Vehicle>();
+
+    public void Run()
+    {
+        while (true)
+        {
+            Console.WriteLine("Araç Yönetim Sistemi");
+            Console.WriteLine("1. Araç Ekle");
+            Console.WriteLine("2. Araç Sil");
+            Console.WriteLine("3. Araç Listele");
+            Console.WriteLine("4. Aracı Sat");
+            Console.WriteLine("5. Aracı Kirala");
+            Console.WriteLine("0. Çıkış");
+            Console.Write("Seçiminizi yapın: ");
+            var choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    AddVehicle();
+                    break;
+                case "2":
+                    RemoveVehicle();
+                    break;
+                case "3":
+                    ListVehicles();
+                    break;
+                case "4":
+                    SellVehicle();
+                    break;
+                case "5":
+                    RentVehicle();
+                    break;
+                case "0":
+                    return;
+                default:
+                    Console.WriteLine("Geçersiz seçim, lütfen tekrar deneyin.");
+                    break;
+            }
+        }
+    }
+
+    private void AddVehicle()
+    {
+        Console.Write("Araç Tipi (Araba/Kamyonet): ");
+        string type = Console.ReadLine();
+        Console.Write("Araç Fiyatı: ");
+        if (decimal.TryParse(Console.ReadLine(), out decimal price))
+        {
+            vehicles.Add(new Vehicle(type, price));
+            Console.WriteLine("Araç eklendi.");
+        }
+        else
+        {
+            Console.WriteLine("Geçersiz fiyat girişi. Lütfen sayısal bir değer girin.");
+        }
+    }
+
+    private void RemoveVehicle()
+    {
+        ListVehicles();
+        Console.Write("Silmek istediğiniz aracın ID'sini girin: ");
+        if (int.TryParse(Console.ReadLine(), out int id))
+        {
+            vehicles.RemoveAll(v => v.Id == id);
+            Console.WriteLine("Araç silindi.");
+        }
+        else
+        {
+            Console.WriteLine("Geçersiz ID girişi.");
+        }
+    }
+
+    private void ListVehicles()
+    {
+        Console.WriteLine("Araç Listesi:");
+        foreach (var vehicle in vehicles)
+        {
+            Console.WriteLine(vehicle);
+        }
+    }
+
+    private void SellVehicle()
+    {
+        ListVehicles();
+        Console.Write("Satmak istediğiniz aracın ID'sini girin: ");
+        if (int.TryParse(Console.ReadLine(), out int id))
+        {
+            var vehicle = vehicles.Find(v => v.Id == id);
+            if (vehicle != null)
+            {
+                Console.Write("İndirim yüzdesi (örnek: 10, 15, 20): ");
+                if (decimal.TryParse(Console.ReadLine(), out decimal discountPercentage))
+                {
+                    decimal discountAmount = vehicle.Price * (discountPercentage / 100);
+                    decimal finalPrice = vehicle.Price - discountAmount;
+
+                    Console.WriteLine($"Araç Satıldı! İndirim: {discountAmount}, Satış Tutarı: {finalPrice}");
+                    vehicles.Remove(vehicle);
+                }
+                else
+                {
+                    Console.WriteLine("Geçersiz indirim yüzdesi.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Araç bulunamadı.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Geçersiz ID girişi.");
+        }
+    }
+
+    private void RentVehicle()
+    {
+        ListVehicles();
+        Console.Write("Kiralamak istediğiniz aracın ID'sini girin: ");
+        if (int.TryParse(Console.ReadLine(), out int id))
+        {
+            var vehicle = vehicles.Find(v => v.Id == id);
+            if (vehicle != null)
+            {
+                Console.Write("Kiralama süresi (gün): ");
+                if (int.TryParse(Console.ReadLine(), out int rentalDays))
+                {
+                    decimal rentalPrice = vehicle.Price * rentalDays;
+                    Console.Write("İndirim yüzdesi (örnek: 10, 20): ");
+                    if (decimal.TryParse(Console.ReadLine(), out decimal discountPercentage))
+                    {
+                        decimal discountAmount = rentalPrice * (discountPercentage / 100);
+                        decimal finalRentalPrice = rentalPrice - discountAmount;
+
+                        Console.WriteLine($"Araç Kiralandı! İndirim: {discountAmount}, Toplam Kiralama Tutarı: {finalRentalPrice}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Geçersiz indirim yüzdesi.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Geçersiz kiralama süresi.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Araç bulunamadı.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Geçersiz ID girişi.");
+        }
+    }
+}
+
+public class Vehicle
+{
+    private static int idCounter = 1;
+    public int Id { get; }
+    public string Type { get; }
+    public decimal Price { get; }
+
+    public Vehicle(string type, decimal price)
+    {
+        Id = idCounter++;
+        Type = type;
+        Price = price;
+    }
+
+    public override string ToString()
+    {
+        return $"ID: {Id}, Tip: {Type}, Fiyat: {Price}";
+    }
+}
